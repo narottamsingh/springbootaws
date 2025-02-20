@@ -8,13 +8,13 @@ phases:
       - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
       - echo $REPOSITORY_URI
       - aws --version
-      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/c7c0l3h6
-      - REPOSITORY_URI=291548415763.dkr.ecr.us-east-1.amazonaws.com/springbootaws
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 291548415763.dkr.ecr.ap-south-1.amazonaws.com
+      - REPOSITORY_URI=291548415763.dkr.ecr.ap-south-1.amazonaws.com/simple-docker-service-02449dbdb429
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
-      - echo Build started on `date`
+      - echo B291548415763.dkr.ecr.us-east-1.amazonaws.com/springbootawsuild started on `date`
       - mvn package
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
@@ -24,4 +24,16 @@ phases:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definations file..
+      # give your container name
+      - DOCKER_CONTAINER_NAME=app-ecr-container
+      - printf '[{"name":"%s",imageUri":"%s"}]' $DOCKER_CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefination.json
+      - echo $DOCKER_CONTAINER_NAME 
+      - ehco printing imagedefination.json
+      - cat imagedefination.json
+  tifacts:
+  files:
+      - imagedefination.json
+      - target/spring-boot-basic.jar
