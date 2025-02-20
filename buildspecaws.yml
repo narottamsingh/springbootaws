@@ -33,7 +33,3 @@ phases:
       - echo $DOCKER_CONTAINER_NAME 
       - ehco printing imagedefination.json
       - cat imagedefination.json
-  artifacts:
-    files:
-      - imagedefination.json
-      - target/spring-boot-basic.jar
